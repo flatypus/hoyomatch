@@ -1,3 +1,4 @@
 .temp/
 music/
 *.pck
+.DS_Store
