@@ -12,13 +12,14 @@ const text =
 
 text
   .split("\n")
-  .map((f) => /Music.+\.wem/g?.exec(f)?.[0])
-  .filter(Boolean)
-  .map((f) => `${TMPPATH}/${f}`)
-  .forEach(async (f) => {
-    await $`sh -c 'vgmstream-cli "${f}"`;
-    const i_f = `"${f}.wav"`;
-    const o_f = `"${f.replace(TMPPATH, OUTPATH).replace(".wem", ".mp3")}"`;
-    await $`sh -c 'ffmpeg -y -i ${i_f} ${o_f}'`;
-    await $`sh -c 'rm -f "${f}" ${i_f}'`;
+  .map((f) => /Music.+\.wem/.exec(f)?.[0])
+  .filter((f): f is string => Boolean(f))
+  .forEach(async (raw_f) => {
+    const wem_f = `"${TMPPATH}/${raw_f}"`;
+    const esc_f = raw_f.replace(/~[^.]+(?=\.wem$)/, "");
+    const wav_f = `"${TMPPATH}/${esc_f}.wav"`;
+    await $`sh -c 'vgmstream-cli -o ${wav_f} ${wem_f}'`;
+    const o_f = `"${OUTPATH}/${esc_f.replace(".wem", ".mp3")}"`;
+    await $`sh -c 'ffmpeg -y -v -8 -i ${wav_f} ${o_f}'`;
+    await $`sh -c 'rm -f ${wem_f} ${wav_f}'`;
   });
