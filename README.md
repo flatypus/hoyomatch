@@ -12,6 +12,8 @@ Prerequisites:
 
 Exec: `bun run fingerprint.ts`
 
+<img width="1030" height="302" alt="image" src="https://github.com/user-attachments/assets/b19d600e-2131-4277-9176-ceff06c16552" />
+
 ### Extractor: Extracts `.mp3` files from Genshin's raw `.pck` format w/ ~128kbps
 
 Prerequisites:
@@ -21,7 +23,7 @@ Prerequisites:
 4. Connect your phone via. USB cable w/ data transfer
 5. Install `vgmstream` (`brew install vgmstream`)
 7. Install `ffmpeg`
-8. (Optional) Install `adb` and run `adb start-server && adb shell`, check connectivity
+8. (Optional, if pulling from phone) Install `adb` and run `adb start-server && adb shell`, check connectivity
 9. Install `bun`
 
 Exec: `bun run extractor.ts`
