@@ -81,6 +81,7 @@ export class Fingerprint {
     const start = performance.now();
     const bank = await this.loadBank();
     const ref = await this.fingerprint(ref_file);
+    console.log(`Matching ${ref_file}:`);
 
     const results: { file: FingerprintRecord; similarity: number }[] = [];
 
