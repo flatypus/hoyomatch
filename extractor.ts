@@ -2,7 +2,7 @@ import { $ } from "bun";
 
 const INPUT_PATH = "Music1.pck";
 
-await $`adb pull /sdcard/Android/data/com.miHoYo.GenshinImpact/files/AudioAssets/${INPUT_PATH}`;
+// await $`adb pull /sdcard/Android/data/com.miHoYo.GenshinImpact/files/AudioAssets/${INPUT_PATH}`;
 
 const TMPPATH = `.temp/${INPUT_PATH}`;
 const OUTPATH = `music`;
