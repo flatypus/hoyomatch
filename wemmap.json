@@ -5518,7 +5518,9 @@
     "similarity": 35.6148
   },
   "Music31_17.mp3": {
-    "filename": "The_Immovable_God_and_the_Eternal_Euthymia.flac",
+    "filename": "N/A",
+    "manual": true,
+    "reason": "Literally just clapping, not a song",
     "similarity": 12.766
   },
   "Music11_1.mp3": {
