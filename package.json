@@ -1,0 +1,27 @@
+{
+  "name": "hoyomatch-bun",
+  "version": "1.0.0",
+  "description": "High-performance parallel audio fingerprinting matcher using Bun",
+  "main": "src/fingerprint-bun.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run src/fingerprint-bun.ts",
+    "start": "bun run src/fingerprint-bun.ts",
+    "build": "bun build src/fingerprint-bun.ts --target bun --outfile dist/fingerprint-bun.js",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "keywords": [
+    "audio",
+    "fingerprinting",
+    "chromaprint",
+    "parallel",
+    "bun",
+    "performance"
+  ],
+  "author": "",
+  "license": "MIT"
+}

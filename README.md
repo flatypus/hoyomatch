@@ -9,8 +9,9 @@ Prerequisites:
 4. Connect your phone via. USB cable w/ data transfer
 5. Install `adb` and run `adb start-server && adb shell`, check connectivity
 6. Install `vgmstream` (`brew install vgmstream`)
-7. Install `ffmpeg`
-8. Install `bun`
+7  Install `chromaprint` (`brew install chromaprint`)
+8. Install `ffmpeg`
+9. Install `bun`
 
 Exec:
 `bun run music.ts`
