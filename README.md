@@ -1,8 +1,9 @@
-## Genshin OST Fingerprint & Audio Extractor
+# Genshin OST Fingerprint Recognition & Audio Extractor
 
-Two small services for those trying to do stuff with Genshin's audio files. Set up on Mac, but helper services should be the same
+Two small services for those trying to do stuff with Genshin's audio files. Set up on Mac, but helper services should be the same. 
+Additionally comes with full wemmap.json (maps Genshin internal .wem file to OST name) as of 5.8
 
-### HoyoMatch: Accepts any `.mp3` & finds the closest song match from OST database
+## HoyoMatch: Finds the closest song match from OST database
 - Uses C w/ bun FFI for ~48x speedup (4 min -> 5 seconds)
 - Searches over 1400+ songs to find closest match
 
@@ -14,7 +15,7 @@ Exec: `bun run fingerprint.ts`
 
 <img width="1030" height="302" alt="image" src="https://github.com/user-attachments/assets/b19d600e-2131-4277-9176-ceff06c16552" />
 
-### Extractor: Extracts `.mp3` files from Genshin's raw `.pck` format w/ ~128kbps
+## Extractor: Extracts `.mp3` files from Genshin's raw `.pck` format
 
 Prerequisites:
 1. Be on Mac (other Unix should require the [appropriate `quickbms` executable](https://aluigi.altervista.org))
