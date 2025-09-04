@@ -2,13 +2,19 @@ import { readdir, writeFile, readFile } from "fs/promises";
 import { basename, extname, join } from "path";
 import { $ } from "bun";
 
+type FingerprintRecord = {
+  filename: string;
+  metadata: string;
+  fingerprint: string;
+}
+
+type FingerprintBank = FingerprintRecord[];
+
+
 class Fingerprint {
   MAX_BIT_ERROR = 2;
   MAX_ALIGN_OFFSET = 120;
-  ref_file: string = "";
-  folder_path: string = "";
   bank_file: string = "fingerprint_bank.json";
-  fingerprint_bank: Record<string, string> = {};
 
   private _popcount(x: number): number {
     return x.toString(2).split("1").length - 1;
@@ -53,83 +59,89 @@ class Fingerprint {
     return topcount / Math.min(asize, bsize);
   }
 
-  async loadBank() {
+  async loadBank(): Promise<FingerprintBank> {
     try {
       const data = await readFile(this.bank_file, "utf-8");
-      const rawBank = JSON.parse(data);
-
-      this.fingerprint_bank = {};
-      for (const [filename, fp] of Object.entries(rawBank)) {
-        this.fingerprint_bank[filename] = fp as string;
-      }
+      return JSON.parse(data) as FingerprintRecord[];
     } catch (error) {
-      this.fingerprint_bank = {};
+     return []
     }
   }
 
-  async saveBank() {
+  async setupBank(folder_path: string) {
+    const directory = await readdir(folder_path);
+    const files: { path: string, filename: string, metadata: string }[] = []
+    
+    for (const f of directory) {
+      const accepted_extensions = [".mp3", ".wav", ".m4a", ".flac"];
+      if (!accepted_extensions.includes(extname(f).toLowerCase())) continue
+      const full_path = join(folder_path, f)
+      // my config, depending on how you download the ost dump, your file names may be different
+      const split = f.split("._")
+      const metadata = split.slice(0, -1).join("._")
+      const filename = split.at(-1)
+      files.push({
+        path: full_path,
+        filename: filename,
+        metadata: metadata 
+      })
+    }
+
+    const fingerprint_bank: FingerprintBank = [];
+
+    await Promise.all(files.map(async (f) => {
+      const fp = await this.fingerprint(f.path);
+      const compressed_fp = this.compressFingerprint(fp);
+      fingerprint_bank.push({ filename: f.filename, fingerprint: compressed_fp, metadata: f.metadata });
+    }))
+
     await writeFile(
       this.bank_file,
-      JSON.stringify(this.fingerprint_bank, null, 2),
+      JSON.stringify(fingerprint_bank, null, 2)
     );
   }
 
   async fingerprint(filePath: string): Promise<number[]> {
-    const fileName = basename(filePath);
-    if (this.fingerprint_bank[fileName]) {
-      return this.decompressFingerprint(this.fingerprint_bank[fileName]);
-    }
-
     const result = await $`fpcalc -raw ${filePath}`.quiet();
     const fingerprint = result.stdout.toString().split("FINGERPRINT=").at(1);
     const fp = fingerprint?.split(",").map(Number) ?? [];
-
-    this.fingerprint_bank[fileName] = this.compressFingerprint(fp);
-
     return fp;
   }
 
-  async getFiles(dir: string) {
-    const files = await readdir(dir);
-    return files
-      .filter((f) =>
-        [".mp3", ".wav", ".m4a", ".flac"].includes(extname(f).toLowerCase()),
-      )
-      .map((f) => join(dir, f));
-  }
 
-  async find_best_match() {
+  async find_best_match(ref_file: string) {
     await this.loadBank();
     const start = performance.now();
-    const files = await this.getFiles(this.folder_path);
-    const ref = await this.fingerprint(this.ref_file);
-    const promises = files.map(async (f) => {
-      const fp = await this.fingerprint(f);
-      const similarity = this.compute_similarity(ref, fp);
-      return { file: f, similarity };
-    });
+    const bank = await this.loadBank();
+    const ref = await this.fingerprint(ref_file);
 
-    const results = (await Promise.all(promises)).filter((r) => r !== null);
+    
+    const results: { file: FingerprintRecord, similarity: number }[] = [];
+
+    for (let i = 0; i < bank.length; i++) {
+      console.log(`Processing ${i} of ${bank.length}`)
+      const f = bank[i];
+      const fp = this.decompressFingerprint(f.fingerprint);
+      const similarity = this.compute_similarity(ref, fp);
+      results.push({ file: f, similarity });
+    }
+
     const { file, similarity } = results.sort(
       (a, b) => b.similarity - a.similarity,
     )[0];
 
-    await this.saveBank();
     const end = performance.now();
     console.log(`${file}, ${similarity}, (Time taken: ${end - start}ms)`);
 
+    console.log("Top 10 results:")
     for (const r of results
       .sort((a, b) => b.similarity - a.similarity)
       .slice(0, 10)) {
-      console.log(r.file, r.similarity);
+      console.log(r.file.filename, r.similarity, `(${r.file.metadata})`);
     }
-  }
-
-  constructor(ref_file: string, folder_path: string) {
-    this.ref_file = ref_file;
-    this.folder_path = folder_path;
   }
 }
 
-const fingerprint = new Fingerprint("song.mp3", "music");
-await fingerprint.find_best_match();
+const fingerprint = new Fingerprint();
+// await fingerprint.setupBank("../ost");
+await fingerprint.find_best_match("song.mp3");
