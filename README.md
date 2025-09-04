@@ -3,6 +3,8 @@
 Two small services for those trying to do stuff with Genshin's audio files. Set up on Mac, but helper services should be the same
 
 ### HoyoMatch: Accepts any `.mp3` & finds the closest song match from OST database
+- Uses C w/ bun FFI for ~48x speedup (4 min -> 5 seconds)
+- Searches over 1400+ songs to find closest match
 
 Prerequisites: 
 1. Install `chromaprint` (`brew install chromaprint`)
