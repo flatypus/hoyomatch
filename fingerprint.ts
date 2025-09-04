@@ -1,7 +1,7 @@
 import { readdir, writeFile, readFile } from "fs/promises";
 import { extname, join } from "path";
 import { $ } from "bun";
-import { compute_similarity } from "./lib";
+import { compute_similarity, decompressFingerprint } from "./lib";
 
 type FingerprintRecord = {
   filename: string;
@@ -11,7 +11,7 @@ type FingerprintRecord = {
 
 type FingerprintBank = FingerprintRecord[];
 
-class Fingerprint {
+export class Fingerprint {
   bank_file: string = "fingerprint_bank.json";
 
   compressFingerprint(fp: Uint32Array): string {
@@ -22,13 +22,6 @@ class Fingerprint {
     }
     const bytes = new Uint8Array(buffer);
     return btoa(String.fromCharCode(...bytes));
-  }
-
-  decompressFingerprint(compressed: string): number[] {
-    const bytes = Uint8Array.from(atob(compressed), (c) => c.charCodeAt(0));
-    const buffer = bytes.buffer;
-    const view = new Uint32Array(buffer);
-    return Array.from(view);
   }
 
   async loadBank(): Promise<FingerprintBank> {
@@ -105,8 +98,8 @@ class Fingerprint {
       );
 
       const f = bank[i];
-      const fp = this.decompressFingerprint(f.fingerprint);
-      const similarity = compute_similarity(ref, new Uint32Array(fp));
+      const fp = decompressFingerprint(f.fingerprint);
+      const similarity = compute_similarity(ref, fp);
       results.push({
         file: f,
         similarity: parseFloat((similarity * 100).toFixed(4)),
@@ -131,17 +124,17 @@ class Fingerprint {
       .sort((a, b) => b.similarity - a.similarity)
       .slice(0, 5)
       .forEach(({ file, similarity: s }) => {
-        console.log(`${file.filename}, ${s}% ${s > 80 && "🔥"}`);
+        console.log(`${file.filename}, ${s}% ${s > 80 ? "🔥" : ""}`);
       });
     console.log("=".repeat(100), "\n");
     console.log(
       `Best: ${file.filename}, ${similarity}% (Time taken: ${end - start}ms)`,
     );
     console.log(`Metadata: ${file.metadata}\n`);
+    return { file, similarity };
   }
 }
 
 const fingerprint = new Fingerprint();
-// await fingerprint.setupBank("../ost");
-await fingerprint.find_best_match("song1.mp3");
-await fingerprint.find_best_match("song2.mp3");
+// await fingerprint.setupBank("../ost"); --> // setting up my bank
+// await fingerprint.find_best_match("music/Music31_32.mp3"); // --> Whisper_of_Domus_Aurea.flac, 24.6855%

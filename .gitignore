@@ -4,4 +4,3 @@ music/
 node_modules/
 dist/
 *.mp3
-.DS_Store

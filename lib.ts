@@ -24,14 +24,12 @@ export function compute_similarity(
   fingerprint1: Uint32Array,
   fingerprint2: Uint32Array,
 ) {
-  const start = performance.now();
   const result = _compute_similarity(
     fingerprint1,
     fingerprint1.length,
     fingerprint2,
     fingerprint2.length,
   );
-  const end = performance.now();
   return result;
 }
 

@@ -3,8 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define MAX_BIT_ERROR 2
-#define MAX_ALIGN_OFFSET 120
+#define MAX_BIT_ERROR 6
 
 int _popcount(uint32_t x)
 {
@@ -53,10 +52,7 @@ double compute_similarity(uint32_t *a, int asize, uint32_t *b, int bsize)
 
     for (int i = 0; i < asize; i++)
     {
-        int jbegin = max(0, i - MAX_ALIGN_OFFSET);
-        int jend = min(bsize, i + MAX_ALIGN_OFFSET);
-
-        for (int j = jbegin; j < jend; j++)
+        for (int j = 0; j < bsize; j++)
         {
             int biterror = _popcount(a[i] ^ b[j]);
             if (biterror <= MAX_BIT_ERROR)
