@@ -1,4 +1,4 @@
-### Genshin OST Fingerprint & Audio Extractor (android -> macos)
+## Genshin OST Fingerprint & Audio Extractor
 
 Two small services for those trying to do stuff with Genshin's audio files. Set up on Mac, but helper services should be the same
 
