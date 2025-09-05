@@ -137,5 +137,5 @@ export class Fingerprint {
 }
 
 const fingerprint = new Fingerprint();
-// await fingerprint.setupBank("../ost"); --> // setting up my bank
-// await fingerprint.find_best_match("music/Music31_32.mp3"); // --> Whisper_of_Domus_Aurea.flac, 24.6855%
+// await fingerprint.setupBank("../ost"); // --> setting up my bank
+// await fingerprint.find_best_match("music/Music31_32.mp3");

@@ -13,7 +13,7 @@ const text =
 await Promise.all(
   text
     .split("\n")
-    .map((f) => /Music.+\.wem/.exec(f)?.[0])
+    .map((f) => f.split("  ").at(-1)?.trim())
     .filter((f): f is string => Boolean(f))
     .map(async (raw_f) => {
       const wem_f = `"${TMPPATH}/${raw_f}"`;
